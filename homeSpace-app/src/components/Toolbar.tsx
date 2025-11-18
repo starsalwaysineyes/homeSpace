@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
   AppBar,
-  Toolbar,
+  Toolbar as MuiToolbar,
   Typography,
   Button,
   ButtonGroup,
@@ -33,7 +33,7 @@ export function Toolbar({ onAddEntity, onToggleMode, onSave, onSearch }: Toolbar
 
   return (
     <AppBar position="static" sx={{ backgroundColor: '#1976d2' }}>
-      <Toolbar>
+      <MuiToolbar>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           HomeSpace 3D
         </Typography>
@@ -69,7 +69,7 @@ export function Toolbar({ onAddEntity, onToggleMode, onSave, onSearch }: Toolbar
         <IconButton color="inherit" onClick={onSave}>
           <Save />
         </IconButton>
-      </Toolbar>
+      </MuiToolbar>
     </AppBar>
   )
 }
