@@ -1,7 +1,6 @@
 import { useState, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Mesh } from 'three'
-import * as THREE from 'three'
 
 interface BoxProps {
   position: [number, number, number]
@@ -38,12 +37,6 @@ export function Box({ position, size, color, isStorageContainer = false }: BoxPr
         opacity={isStorageContainer ? 0.9 : 1}
         transparent={isStorageContainer}
       />
-      {isStorageContainer && (
-        <lineSegments>
-          <edgesGeometry args={[new THREE.BoxGeometry(...size)]} />
-          <lineBasicMaterial color="#000000" linewidth={2} />
-        </lineSegments>
-      )}
     </mesh>
   )
 }

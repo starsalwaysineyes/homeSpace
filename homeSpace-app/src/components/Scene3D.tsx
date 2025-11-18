@@ -1,5 +1,5 @@
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, Grid, Environment } from '@react-three/drei'
+import { OrbitControls, Grid } from '@react-three/drei'
 import { Suspense } from 'react'
 import { Box } from './Box'
 import { Wall } from './Wall'
@@ -51,9 +51,6 @@ export function Scene3D() {
           minDistance={5}
           maxDistance={50}
         />
-
-        {/* 环境贴图 */}
-        <Environment preset="city" />
       </Suspense>
     </Canvas>
   )
