@@ -11,7 +11,8 @@ export function useEntities() {
       size: [2, 2, 2],
       color: '#8b4513',
       isStorageContainer: true,
-      items: ['钥匙', '手套', '笔']
+      items: ['钥匙', '手套', '笔'],
+      status: 'placed'
     },
     {
       id: '2',
@@ -20,11 +21,12 @@ export function useEntities() {
       position: [0, 2.5, -5],
       size: [10, 5, 0.2],
       color: '#d3d3d3',
-      isStorageContainer: false
+      isStorageContainer: false,
+      status: 'placed'
     }
   ])
 
-  const addEntity = (type: 'box' | 'wall', position: [number, number, number]) => {
+  const addEntity = (type: 'box' | 'wall', position: [number, number, number], status: 'preview' | 'placed' = 'placed') => {
     const newEntity: Entity = {
       id: Date.now().toString(),
       name: `新${type === 'box' ? '盒子' : '墙体'}`,
@@ -32,9 +34,10 @@ export function useEntities() {
       position,
       size: type === 'box' ? [1, 1, 1] : [5, 3, 0.2],
       color: type === 'box' ? '#888888' : '#d3d3d3',
-      isStorageContainer: false
+      isStorageContainer: false,
+      status
     }
-    setEntities([...entities, newEntity])
+    setEntities(prev => [...prev, newEntity])
     return newEntity
   }
 
@@ -46,6 +49,16 @@ export function useEntities() {
 
   const deleteEntity = (id: string) => {
     setEntities(entities.filter(entity => entity.id !== id))
+  }
+
+  const confirmEntity = (id: string) => {
+    setEntities(prev => prev.map(entity =>
+      entity.id === id ? { ...entity, status: 'placed' } : entity
+    ))
+  }
+
+  const cleanupPreview = () => {
+    setEntities(prev => prev.filter(entity => entity.status !== 'preview'))
   }
 
   const getEntityById = (id: string) => {
@@ -75,6 +88,8 @@ export function useEntities() {
     updateEntity,
     deleteEntity,
     getEntityById,
-    searchItems
+    searchItems,
+    confirmEntity,
+    cleanupPreview
   }
 }

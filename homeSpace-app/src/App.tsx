@@ -15,28 +15,37 @@ const darkTheme = createTheme({
   },
 })
 
+
+
 function App() {
   const {
     entities,
     addEntity,
     updateEntity,
     deleteEntity,
-    searchItems
+    searchItems,
+    confirmEntity,
+    cleanupPreview
   } = useEntities()
 
   const [selectedEntity, setSelectedEntity] = useState<Entity | null>(null)
-  // We no longer need isAddingEntity state for the "click ground" mode as we spawn immediately
-  // But we might want to keep it if we want to support both. 
-  // For now, let's follow the new requirement: Select from sidebar -> Spawn -> Move -> Confirm.
 
   const handleAddEntity = (type: 'box' | 'wall') => {
+    // Cleanup any existing preview entities first
+    cleanupPreview()
+
     // Spawn at a default position (e.g., center of the room, slightly above ground)
     const defaultPosition: [number, number, number] = [0, 1, 0]
-    const newEntity = addEntity(type, defaultPosition)
+    // Add new entity with 'preview' status
+    const newEntity = addEntity(type, defaultPosition, 'preview')
     setSelectedEntity(newEntity)
   }
 
   const handleEntityClick = (entity: Entity) => {
+    // If we are clicking a different entity, cleanup any previews
+    if (selectedEntity?.status === 'preview' && selectedEntity.id !== entity.id) {
+      cleanupPreview()
+    }
     setSelectedEntity(entity)
   }
 
@@ -57,7 +66,10 @@ function App() {
   }
 
   const handleConfirm = () => {
-    setSelectedEntity(null)
+    if (selectedEntity) {
+      confirmEntity(selectedEntity.id)
+      setSelectedEntity(null)
+    }
   }
 
   const handleDelete = () => {
@@ -118,7 +130,12 @@ function App() {
             <Scene3D
               entities={entities}
               onEntityClick={handleEntityClick}
-              onGroundClick={() => setSelectedEntity(null)} // Click ground to deselect
+              onGroundClick={() => {
+                if (selectedEntity?.status === 'preview') {
+                  cleanupPreview()
+                }
+                setSelectedEntity(null)
+              }}
               selectedEntityId={selectedEntity?.id || null}
             />
           </Box>

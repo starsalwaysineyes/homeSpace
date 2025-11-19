@@ -1,3 +1,4 @@
+import { useRef, useEffect } from 'react'
 import { Box, Typography, Button, IconButton, Paper } from '@mui/material'
 import {
     ArrowUpward,
@@ -19,6 +20,37 @@ interface ControlPanelProps {
 }
 
 export function ControlPanel({ selectedEntity, onMove, onConfirm, onDelete }: ControlPanelProps) {
+    const intervalRef = useRef<number | null>(null)
+    const timeoutRef = useRef<number | null>(null)
+
+    const stopMoving = () => {
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current)
+            intervalRef.current = null
+        }
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current)
+            timeoutRef.current = null
+        }
+    }
+
+    const startMoving = (axis: 'x' | 'y' | 'z', delta: number) => {
+        stopMoving()
+        onMove(axis, delta) // Trigger once immediately
+
+        // Wait a bit before starting continuous movement
+        timeoutRef.current = setTimeout(() => {
+            intervalRef.current = setInterval(() => {
+                onMove(axis, delta)
+            }, 50) // 50ms interval for smooth movement
+        }, 300) // 300ms delay before auto-repeat
+    }
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => stopMoving()
+    }, [])
+
     if (!selectedEntity) {
         return (
             <Box sx={{ width: 300, minWidth: 300, maxWidth: 300, flexShrink: 0, bgcolor: 'background.paper', borderLeft: 1, borderColor: 'divider', height: '100%', p: 2 }}>
@@ -38,31 +70,73 @@ export function ControlPanel({ selectedEntity, onMove, onConfirm, onDelete }: Co
                 {selectedEntity.name}
             </Typography>
 
-            <Paper variant="outlined" sx={{ p: 2 }}>
+            <Paper variant="outlined" sx={{ p: 2, userSelect: 'none' }}>
                 <Typography variant="subtitle2" gutterBottom align="center">位置控制</Typography>
 
                 {/* X Axis */}
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                     <Typography variant="caption" sx={{ width: 40 }}>X轴</Typography>
-                    <IconButton onClick={() => onMove('x', -0.5)} size="small"><ArrowBack /></IconButton>
+                    <IconButton
+                        onPointerDown={() => startMoving('x', -0.1)}
+                        onPointerUp={stopMoving}
+                        onPointerLeave={stopMoving}
+                        size="small"
+                    >
+                        <ArrowBack />
+                    </IconButton>
                     <Typography variant="caption">{selectedEntity.position[0].toFixed(1)}</Typography>
-                    <IconButton onClick={() => onMove('x', 0.5)} size="small"><ArrowForward /></IconButton>
+                    <IconButton
+                        onPointerDown={() => startMoving('x', 0.1)}
+                        onPointerUp={stopMoving}
+                        onPointerLeave={stopMoving}
+                        size="small"
+                    >
+                        <ArrowForward />
+                    </IconButton>
                 </Box>
 
                 {/* Y Axis */}
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                     <Typography variant="caption" sx={{ width: 40 }}>Y轴</Typography>
-                    <IconButton onClick={() => onMove('y', -0.5)} size="small"><ArrowDownward /></IconButton>
+                    <IconButton
+                        onPointerDown={() => startMoving('y', -0.1)}
+                        onPointerUp={stopMoving}
+                        onPointerLeave={stopMoving}
+                        size="small"
+                    >
+                        <ArrowDownward />
+                    </IconButton>
                     <Typography variant="caption">{selectedEntity.position[1].toFixed(1)}</Typography>
-                    <IconButton onClick={() => onMove('y', 0.5)} size="small"><ArrowUpward /></IconButton>
+                    <IconButton
+                        onPointerDown={() => startMoving('y', 0.1)}
+                        onPointerUp={stopMoving}
+                        onPointerLeave={stopMoving}
+                        size="small"
+                    >
+                        <ArrowUpward />
+                    </IconButton>
                 </Box>
 
                 {/* Z Axis */}
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                     <Typography variant="caption" sx={{ width: 40 }}>Z轴</Typography>
-                    <IconButton onClick={() => onMove('z', -0.5)} size="small"><KeyboardDoubleArrowUp /></IconButton>
+                    <IconButton
+                        onPointerDown={() => startMoving('z', -0.1)}
+                        onPointerUp={stopMoving}
+                        onPointerLeave={stopMoving}
+                        size="small"
+                    >
+                        <KeyboardDoubleArrowUp />
+                    </IconButton>
                     <Typography variant="caption">{selectedEntity.position[2].toFixed(1)}</Typography>
-                    <IconButton onClick={() => onMove('z', 0.5)} size="small"><KeyboardDoubleArrowDown /></IconButton>
+                    <IconButton
+                        onPointerDown={() => startMoving('z', 0.1)}
+                        onPointerUp={stopMoving}
+                        onPointerLeave={stopMoving}
+                        size="small"
+                    >
+                        <KeyboardDoubleArrowDown />
+                    </IconButton>
                 </Box>
             </Paper>
 

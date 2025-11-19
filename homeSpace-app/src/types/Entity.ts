@@ -7,6 +7,7 @@ export interface Entity {
   color: string
   isStorageContainer: boolean
   items?: string[]
+  status?: 'preview' | 'placed'
 }
 
 export interface SceneState {
