@@ -1,5 +1,4 @@
 import { useState, useRef } from 'react'
-import { useFrame } from '@react-three/fiber'
 import { Mesh } from 'three'
 
 interface BoxProps {
@@ -7,25 +6,30 @@ interface BoxProps {
   size: [number, number, number]
   color: string
   isStorageContainer?: boolean
+  isSelected?: boolean
+  onClick: () => void
 }
 
-export function Box({ position, size, color, isStorageContainer = false }: BoxProps) {
+export function Box({
+  position,
+  size,
+  color,
+  isStorageContainer = false,
+  isSelected = false,
+  onClick
+}: BoxProps) {
   const meshRef = useRef<Mesh>(null)
   const [hovered, setHover] = useState(false)
-  const [active, setActive] = useState(false)
-
-  useFrame((state, delta) => {
-    if (meshRef.current && active) {
-      meshRef.current.rotation.y += delta
-    }
-  })
 
   return (
     <mesh
       position={position}
       ref={meshRef}
-      scale={active ? 1.1 : 1}
-      onClick={() => setActive(!active)}
+      scale={isSelected ? 1.05 : (hovered ? 1.02 : 1)}
+      onClick={(e) => {
+        e.stopPropagation()
+        onClick()
+      }}
       onPointerOver={() => setHover(true)}
       onPointerOut={() => setHover(false)}
       castShadow
@@ -33,9 +37,10 @@ export function Box({ position, size, color, isStorageContainer = false }: BoxPr
     >
       <boxGeometry args={size} />
       <meshStandardMaterial
-        color={hovered ? '#ff6b6b' : color}
+        color={isSelected ? '#4caf50' : (hovered ? '#ff6b6b' : color)}
         opacity={isStorageContainer ? 0.9 : 1}
         transparent={isStorageContainer}
+        wireframe={isSelected}
       />
     </mesh>
   )
